@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Validation Form</title>
+
+  <!-- Page Styling -->
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -68,6 +70,8 @@
     }
   </style>
 </head>
+
+<!-- Validation Form -->
 <body>
   <form id="validationForm" onsubmit="validateForm(); return false;">
     <h2>Input Validation Form</h2>
@@ -119,6 +123,7 @@
     <button type="submit">Validate</button>
   </form>
 
+  <!-- Regex patterns for validation -->
   <script>
     const patterns = {
       email: /^[\w\.-]+@[\w\.-]+\.\w+$/,
@@ -132,6 +137,7 @@
       currency: /^\$\d{1,3}(,\d{3})*(\.\d{2})?$/
     };
 
+    // Validate form function
     function validateForm() {
       const fields = {
         email: "Email",
@@ -145,11 +151,13 @@
         currency: "Currency"
       };
 
+    //   Loop through each input and test with regex
       for (let id in fields) {
         const value = document.getElementById(id).value;
         const isValid = patterns[id].test(value);
         const resultSpan = document.getElementById("res-" + id);
 
+        // Display results below the input
         if (isValid) {
           resultSpan.textContent = "Valid " + fields[id];
           resultSpan.className = "result valid";
