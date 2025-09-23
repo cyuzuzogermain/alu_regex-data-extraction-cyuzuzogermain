@@ -2,170 +2,307 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Validation Form</title>
-
-  <!-- Page Styling -->
+  <title>Regex Extractor</title>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #f5f7fa; 
-      padding: 40px; 
-      display: flex; 
-      justify-content: center; 
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    form { 
-      background: #fff; 
-      padding: 25px 30px; 
-      border-radius: 12px; 
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1); 
-      width: 400px; 
+    header {
+      width: 100%;
+      background: #0e173b;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
     }
-    h2 { 
-      text-align: center; 
-      margin-bottom: 20px; 
-      color: #333; 
+    .container {
+      width: 92%;
+      max-width: 950px;
+      margin: 24px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
-    .form-group { 
-      margin-bottom: 18px; 
-    }
-    label { 
-      display: block; 
-      margin-bottom: 6px; 
-      font-weight: bold; 
-      color: #444; 
-    }
-    input { 
-      padding: 10px; 
-      width: 100%; 
-      border: 1px solid #ccc; 
-      border-radius: 6px; 
-      transition: border-color 0.3s, box-shadow 0.3s; 
+    textarea {
+      width: 90%;
+      min-height: 140px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       font-size: 14px;
+      resize: vertical;
     }
-    input:focus { 
-      border-color: #4A90E2; 
-      box-shadow: 0 0 6px rgba(74, 144, 226, 0.3); 
-      outline: none; 
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    .result { 
-      margin-top: 5px; 
-      font-size: 0.9em; 
+    button {
+      background: #2a3a86;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    .valid { color: green; font-weight: bold; }
-    .invalid { color: red; font-weight: bold; }
-    button { 
-      width: 100%; 
-      margin-top: 10px; 
-      padding: 12px; 
-      font-size: 16px; 
-      background: #4A90E2; 
-      color: #fff; 
-      border: none; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      transition: background 0.3s; 
+    button:hover { background: #1d2a63; }
+    #status {
+      margin-top: 14px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
     }
-    button:hover { 
-      background: #357ABD; 
+    #results {
+      margin-top: 20px;
+      display: grid;
+      gap: 18px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+    }
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      background: #0e173b;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .item {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .item:last-child { border-bottom: none; }
+    .item code {
+      background: #eef1f8;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .muted { color: #888; }
+    /* Modal */
+    .modal {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%; max-width: 400px;
+      text-align: center;
+    }
+    .hidden { display: none; }
+    .dropzone {
+      margin-top: 15px;
+      padding: 20px;
+      border: 2px dashed #0e173b;
+      border-radius: 10px;
+      background: #f9faff;
+      cursor: pointer;
+    }
+    .dropzone.drag {
+      background: #dfe6ff;
     }
   </style>
 </head>
-
-<!-- Validation Form -->
 <body>
-  <form id="validationForm" onsubmit="validateForm(); return false;">
-    <h2>Input Validation Form</h2>
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="text" id="email" required>
-      <span class="result" id="res-email"></span>
-    </div>
-    <div class="form-group">
-      <label>URL:</label>
-      <input type="text" id="url" required>
-      <span class="result" id="res-url"></span>
-    </div>
-    <div class="form-group">
-      <label>Phone Number:</label>
-      <input type="text" id="phone" required>
-      <span class="result" id="res-phone"></span>
-    </div>
-    <div class="form-group">
-      <label>Credit Card Number:</label>
-      <input type="text" id="creditCard" required>
-      <span class="result" id="res-creditCard"></span>
-    </div>
-    <div class="form-group">
-      <label>Time (24h):</label>
-      <input type="text" id="time24" required>
-      <span class="result" id="res-time24"></span>
-    </div>
-    <div class="form-group">
-      <label>Time (12h):</label>
-      <input type="text" id="time12" required>
-      <span class="result" id="res-time12"></span>
-    </div>
-    <div class="form-group">
-      <label>HTML Tag:</label>
-      <input type="text" id="htmlTag" required>
-      <span class="result" id="res-htmlTag"></span>
-    </div>
-    <div class="form-group">
-      <label>Hashtag:</label>
-      <input type="text" id="hashtag" required>
-      <span class="result" id="res-hashtag"></span>
-    </div>
-    <div class="form-group">
-      <label>Currency Amount:</label>
-      <input type="text" id="currency" required>
-      <span class="result" id="res-currency"></span>
-    </div>
-    <button type="submit">Validate</button>
-  </form>
+  <header>
+    <h1>Regex Generator</h1>
+  </header>
 
-  <!-- Regex patterns for validation -->
+  <div class="container">
+    <textarea id="input" placeholder="Paste text here or upload a file..."></textarea>
+    <div class="controls">
+      <button id="btn-extract">Generate</button>
+      <button id="btn-clear">Clear</button>
+      <button id="btn-upload">Upload File</button>
+    </div>
+    <div id="status">Awaiting input...</div>
+    <div id="results"></div>
+  </div>
+
+  <!-- File Upload Modal -->
+  <div id="uploadModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Upload a .txt File</h2>
+      <div id="dropzone" class="dropzone">Drop file here or click to browse</div>
+      <input type="file" id="fileInput" accept=".txt" hidden>
+      <div style="margin-top:10px;">
+        <button id="btn-browse">Browse</button>
+        <button id="btn-close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const patterns = {
-      email: /^[\w\.-]+@[\w\.-]+\.\w+$/,
-      url: /^https?:\/\/[^\s/$.?#].[^\s]*$/,
-      phone: /^(\(\d{3}\)\s?\d{3}[-.]?\d{4}|\d{3}[-.]?\d{3}[-.]?\d{4})$/,
-      creditCard: /^(\d{4}[- ]?){3}\d{4}$/,
-      time24: /^(?:[01]\d|2[0-3]):[0-5]\d$/,
-      time12: /^(0?[1-9]|1[0-2]):[0-5]\d\s?(AM|PM|am|pm)$/,
-      htmlTag: /^<([a-z]+)([^<]*)?(?:>(.*)<\/\1>| *\/>|>)$/,
-      hashtag: /^#[A-Za-z0-9_]+$/,
-      currency: /^\$\d{1,3}(,\d{3})*(\.\d{2})?$/
+    // ================== Regex Patterns ==================
+    const REGEX = {
+      email: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+      url: /\bhttps?:\/\/(?:[a-z0-9-]+\.)+[a-z]{2,}(?:[^\s<>\"'()\[\]]*)\b/gi,
+      phone: /(?<=\s|\D|^)(\+?\(?\d{1,3}\)?[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{3,4}/g,
+      card: /\b(?:\d{4}[ -]?){3,5}\d{1,4}\b/g,
+      repeated: /\b(\d{4})(?!\1{1,})([ -]?\1){1,}\b/g,
+      time24: /\b(?:[01]\d|2[0-3]):[0-5]\d\b/g,
+      time12: /\b(?:0?[1-9]|1[0-2]):[0-5]\d\s?(?:AM|PM)\b/gi,
+      tag: /<\/?([a-z][a-z0-9]*)\b[^>]*>/gi,
+      hashtag: /(^|\s)#([A-Za-z0-9_]{1,50})\b/g,
+      usd: /\$\d{1,7}(?:,\d{3})*(?:\.\d{2})?\b/g
     };
 
-    // Validate form function
-    function validateForm() {
-      const fields = {
-        email: "Email",
-        url: "URL",
-        phone: "Phone Number",
-        creditCard: "Credit Card",
-        time24: "Time (24h)",
-        time12: "Time (12h)",
-        htmlTag: "HTML Tag",
-        hashtag: "Hashtag",
-        currency: "Currency"
+    const $ = id => document.querySelector(id);
+
+    const elements = {
+      input: $("#input"),
+      results: $("#results"),
+      status: $("#status"),
+      btnExtract: $("#btn-extract"),
+      btnClear: $("#btn-clear"),
+      btnUpload: $("#btn-upload"),
+      modal: $("#uploadModal"),
+      close: $("#btn-close"),
+      dropzone: $("#dropzone"),
+      file: $("#fileInput"),
+      browse: $("#btn-browse")
+    };
+
+    // ================ Helpers ==================
+    const unique = arr => [...new Set(arr)];
+
+    function validateCards(list) {
+      return list.filter(c => {
+        const digits = c.replace(/[\s-]/g, "");
+        return digits.length >= 16 && !REGEX.repeated.test(c);
+      });
+    }
+
+    // ================ Extraction ==================
+    function runExtraction(text) {
+      return {
+        Emails: unique(text.match(REGEX.email) || []),
+        URLs: unique(text.match(REGEX.url) || []),
+        Phones: unique(text.match(REGEX.phone) || []),
+        "Credit Cards": unique(validateCards(text.match(REGEX.card) || [])),
+        Times: unique([...(text.match(REGEX.time24) || []), ...(text.match(REGEX.time12) || [])]),
+        "HTML Tags": unique(text.match(REGEX.tag) || []),
+        Hashtags: unique(text.match(REGEX.hashtag) || []),
+        "Currency $": unique(text.match(REGEX.usd) || [])
       };
+    }
 
-    //   Loop through each input and test with regex
-      for (let id in fields) {
-        const value = document.getElementById(id).value;
-        const isValid = patterns[id].test(value);
-        const resultSpan = document.getElementById("res-" + id);
+    // ================ UI Render ==================
+    function createCard(title, items) {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `<h3>${title} <span class="badge">${items.length}</span></h3>`;
+      const list = document.createElement("div");
 
-        // Display results below the input
-        if (isValid) {
-          resultSpan.textContent = "Valid " + fields[id];
-          resultSpan.className = "result valid";
-        } else {
-          resultSpan.textContent = "Invalid " + fields[id];
-          resultSpan.className = "result invalid";
-        }
+      if (!items.length) {
+        const none = document.createElement("div");
+        none.className = "item muted";
+        none.textContent = "No matches";
+        list.appendChild(none);
+      } else {
+        items.forEach(val => {
+          const row = document.createElement("div");
+          row.className = "item";
+
+          const code = document.createElement("code");
+          code.textContent = val;
+          row.appendChild(code);
+
+          list.appendChild(row);
+        });
       }
+      div.appendChild(list);
+      return div;
+    }
+
+    function displayResults(result) {
+      elements.results.innerHTML = "";
+      Object.entries(result).forEach(([title, items]) => {
+        elements.results.appendChild(createCard(title, items));
+      });
+    }
+
+    // ================ Event Handlers ==================
+    elements.btnExtract.addEventListener("click", () => {
+      const text = elements.input.value.trim();
+      if (!text) {
+        elements.results.innerHTML = "";
+        elements.status.textContent = "Please paste some text or upload a file.";
+        return;
+      }
+      const result = runExtraction(text);
+      displayResults(result);
+      const total = Object.values(result).reduce((sum, arr) => sum + arr.length, 0);
+      elements.status.textContent = `Found ${total} matches across ${Object.keys(result).length} categories.`;
+    });
+
+    elements.btnClear.addEventListener("click", () => {
+      elements.input.value = "";
+      elements.results.innerHTML = "";
+      elements.status.textContent = "Cleared input";
+    });
+
+    // File upload modal
+    elements.btnUpload.addEventListener("click", () => elements.modal.classList.remove("hidden"));
+    elements.close.addEventListener("click", () => elements.modal.classList.add("hidden"));
+    elements.browse.addEventListener("click", () => elements.file.click());
+    elements.dropzone.addEventListener("click", () => elements.file.click());
+
+    ["dragover", "drop"].forEach(evt => {
+      window.addEventListener(evt, e => e.preventDefault());
+    });
+
+    elements.dropzone.addEventListener("dragover", e => {
+      e.preventDefault();
+      elements.dropzone.classList.add("drag");
+    });
+    elements.dropzone.addEventListener("dragleave", () => elements.dropzone.classList.remove("drag"));
+    elements.dropzone.addEventListener("drop", e => {
+      e.preventDefault();
+      elements.dropzone.classList.remove("drag");
+      handleFile(e.dataTransfer.files[0]);
+    });
+
+    elements.file.addEventListener("change", e => handleFile(e.target.files[0]));
+
+    async function handleFile(file) {
+      if (!file) return;
+      const isTxt = file.type === "text/plain" || /\.txt$/i.test(file.name);
+      if (!isTxt) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        elements.input.value = e.target.result;
+        elements.modal.classList.add("hidden");
+      };
+      reader.readAsText(file);
+      elements.file.value = ""; // reset
     }
   </script>
 </body>
